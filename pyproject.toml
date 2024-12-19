@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "stockai"
+version = "0.1.0"
+description = ""
+authors = ["Jean-Baptiste Poullet <jeanbaptistepoullet@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+openai = "^1.57.4"
+python-dotenv = "^1.0.1"
+yfinance = "^0.2.50"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
