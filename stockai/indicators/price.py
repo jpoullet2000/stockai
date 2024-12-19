@@ -1,6 +1,6 @@
 import pandas as pd
 
-def check_rise_then_fall(df, window_size=20):
+def check_rise_then_fall(df, window_size=20, rise_threshold=100):
     """
     Check if the stock price has risen a lot then falls 50-75% of the rise within a rolling window.
     
@@ -13,16 +13,22 @@ def check_rise_then_fall(df, window_size=20):
     df["price_change"] = df["Close"].pct_change() * 100
     
     # Calculate rolling maximum and minimum percentage change
-    df["rolling_max"] = df["price_change"].rolling(window=window_size).max()
-    df["rolling_min"] = df["price_change"].rolling(window=window_size).min()
-    
-    # Check for a rise greater than 10% and a fall of 50-75% of the rise within the rolling window
-    for i in range(len(df)):
-        if df["rolling_max"].iloc[i] > 10:
-            rise = df["rolling_max"].iloc[i]
-            fall = df["rolling_min"].iloc[i]
-            if fall < -0.5 * rise and fall > -0.75 * rise:
-                return True
+    # Calculate the rolling sum of percentage changes
+    df["rolling_sum"] = df["price_change"].rolling(window=window_size).sum()
+    rise_peak = df["rolling_sum"].max()
+    fall_peak = df["rolling_sum"].min()
+
+    # Check that the rise occurs before the fall in the rolling sum
+    rise_index = df["rolling_sum"].idxmax()
+    fall_index = df["rolling_sum"].idxmin()
+    if rise_index > fall_index:
+        return False
+
+    # Check that the rolling sum has a peak > rise_threshold
+    if rise_peak > rise_threshold:
+        # Check that the rolling sum has a peak < fall_threshold
+        if abs(fall_peak) > 0.25 * abs(rise_peak) and abs(fall_peak) < 0.5 * abs(rise_peak):
+            return True
     return False
     
 

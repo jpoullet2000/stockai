@@ -1,6 +1,12 @@
 import yfinance as yf
 import pandas as pd
 
+
+def filter_stocks():
+    """
+    """
+    pass
+
 def fetch_stock_data(ticker_symbol: str, period: str, interval: str) -> pd.DataFrame:
     """Fetch stock data using Yahoo Finance API.
     
