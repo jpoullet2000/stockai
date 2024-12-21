@@ -1,5 +1,6 @@
+import os
 import yfinance as yf
-import pandas as pd
+from matplotlib import pyplot as plt
 
 
 class Stock:
@@ -30,6 +31,15 @@ class Stock:
             self._data = self.fetch_data(self.period, self.interval)
         return self._data
 
-    def plot_data(self):
-        """Plot the stock data."""
+    def plot_data(self, temp_dir: str = None):
+        """Plot the stock data and save it to a file if temp_dir is provided."""
+        plt.figure()
         self.data["Close"].plot()
+        if temp_dir:
+            file_path = os.path.join(temp_dir, f"{self.ticker_symbol}.png")
+            plt.savefig(file_path)
+            plt.close()
+            return file_path
+        else:
+            plt.show()
+            plt.close()
