@@ -19,7 +19,7 @@ class Report:
     def _get_reason_to_buy(self):
         """Get the reason to buy the stock."""
         for stock in self.stocks:
-            prompt = f"Find the reason to buy {stock.ticker_symbol}."
+            prompt = f"Find the reasons to buy {stock.ticker_symbol}."
             completion = llm_client.chat.completions.create(
                 model="grok-beta",
                 messages=[
