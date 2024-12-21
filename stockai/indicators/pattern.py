@@ -1,4 +1,5 @@
 import pandas as pd
+import inspect
 from stockai.logger import logger
 from stockai.indicators.price import calculate_rsi
 
@@ -71,3 +72,36 @@ def check_weekly_rsi_low(df, window_size=14, rsi_threshold=30):
     if any((rsi_last_month < rsi_threshold).values):
         return True
     return False
+
+
+# def get_all_pattern_functions():
+#     """Returns a list of all functions defined in the pattern module."""
+#     current_module = inspect.getmodule(get_all_pattern_functions)
+#     functions = []
+#     for name, obj in inspect.getmembers(current_module):
+#         if inspect.isfunction(obj) and obj.__module__ == current_module.__name__:
+#             functions.append(obj)
+#     return functions
+
+
+def get_all_pattern_functions():
+    """Returns a list of all functions defined in the pattern module, excluding itself."""
+    current_module = inspect.getmodule(get_all_pattern_functions)
+    functions = []
+    for name, obj in inspect.getmembers(current_module):
+        if (
+            inspect.isfunction(obj)
+            and obj.__module__ == current_module.__name__
+            and name != "get_all_pattern_functions"
+        ):
+            functions.append(obj)
+    return functions
+
+
+# def get_all_pattern_functions():
+#     """Returns a list of all functions defined in this module."""
+#     functions = []
+#     for name, obj in inspect.getmembers(inspect.getmodule(get_all_pattern_functions)):
+#         if inspect.isfunction(obj):
+#             functions.append(obj)
+#     return functions
