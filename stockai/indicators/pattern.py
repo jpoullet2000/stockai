@@ -22,6 +22,9 @@ def check_rise_then_fall(df, window_size=20, rise_threshold=100):
         window_size (int): The size of the rolling window.
 
     """
+    if df.empty:
+        logger.info("Empty DataFrame")
+        return False
     # Calculate the percentage change in the stock price
     df["price_change"] = df["Close"].pct_change() * 100
 

@@ -4,6 +4,47 @@ from matplotlib import pyplot as plt
 from stockai.indicators.price import calculate_rsi
 
 
+def is_ticker_valid(ticker: str) -> str:
+    """Check if a stock ticker is valid on Yahoo Finance, including common exchange suffixes.
+
+    The common exchange suffixes are:
+    - Paris (.PA)
+    - London (.L)
+    - New York (.N)
+    - Nasdaq (.O)
+    - Australia (.AX)
+    - Toronto (.TO)
+    - Hong Kong (.HK)
+
+    Args:
+        ticker (str): The stock ticker symbol to check.
+
+    Returns:
+        str: The valid ticker symbol with the correct suffix, or an empty string if not found.
+
+    """
+    common_suffixes = [
+        "",
+        ".PA",
+        ".L",
+        ".N",
+        ".O",
+        ".AX",
+        ".TO",
+        ".HK",
+    ]  # Add more suffixes as needed
+    for suffix in common_suffixes:
+        full_ticker = ticker + suffix
+        try:
+            stock = yf.Ticker(full_ticker)
+            data = stock.history(period="1d")
+            if not data.empty:
+                return full_ticker
+        except Exception as e:
+            print(f"Error checking ticker {full_ticker}: {e}")
+    return ""
+
+
 class Stock:
     """A class to represent a stock."""
 
@@ -23,6 +64,9 @@ class Stock:
         Returns:
             pd.DataFrame: The stock data as a pandas DataFrame.
         """
+        self.ticker_symbol = is_ticker_valid(self.ticker_symbol)
+        if not self.ticker_symbol:
+            return None
         self._data = yf.download(self.ticker_symbol, period=period, interval=interval)
         return self._data
 

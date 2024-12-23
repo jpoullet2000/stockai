@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Callable
 import stockai.indicators.pattern as pattern_module
 from stockai.indicators.pattern import Pattern
 from stockai.stock import Stock
@@ -44,7 +44,9 @@ class StockFilter:
                 raise ValueError("Invalid stock")
         return stock_objects
 
-    def _get_patterns(self, patterns: List[str] | List[Pattern]) -> List[Pattern]:
+    def _get_patterns(
+        self, patterns: List[str] | List[Callable] | List[Pattern]
+    ) -> List[Pattern]:
         """Get the pattern objects from the given list of patterns.
 
         Args:
@@ -60,6 +62,8 @@ class StockFilter:
                 pattern_objects.append(Pattern(name=pattern, function=pattern_function))
             elif isinstance(pattern, Pattern):
                 pattern_objects.append(pattern)
+            elif isinstance(pattern, Callable):
+                pattern_objects.append(Pattern(name=pattern.__name__, function=pattern))
             else:
                 raise ValueError("Invalid pattern")
         return pattern_objects
@@ -74,6 +78,10 @@ class StockFilter:
         for stock in self.stocks:
             all_patterns_matched = True
             for pattern in self.patterns:
+                if stock.data is None:
+                    logger.info(f"No data available for stock {stock.ticker_symbol}")
+                    all_patterns_matched = False
+                    break
                 if not pattern.check(stock.data):
                     logger.info(f"{stock.ticker_symbol} does not match {pattern.name}")
                     all_patterns_matched = False
