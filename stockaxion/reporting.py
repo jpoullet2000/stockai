@@ -1,11 +1,11 @@
 from typing import List
-from stockai.stock import Stock
-from stockai.utils.llm import llm_client
+from stockaxion.stock import Stock
+from stockaxion.utils.llm import llm_client
 from fpdf import FPDF
 import markdown2
 import tempfile
 from tempfile import TemporaryDirectory
-from stockai.utils.generic import get_date
+from stockaxion.utils.generic import get_date
 
 TEMP_DIR = TemporaryDirectory()
 DEFAULT_INTERVAL = "1wk"

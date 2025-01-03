@@ -1,7 +1,7 @@
 import pandas as pd
 import inspect
-from stockai.logger import logger
-from stockai.indicators.price import calculate_rsi
+from stockaxion.logger import logger
+from stockaxion.indicators.price import calculate_rsi
 
 
 class Pattern:

@@ -1,8 +1,8 @@
 from typing import List, Callable
-import stockai.indicators.pattern as pattern_module
-from stockai.indicators.pattern import Pattern
-from stockai.stock import Stock
-from stockai.logger import logger
+import stockaxion.indicators.pattern as pattern_module
+from stockaxion.indicators.pattern import Pattern
+from stockaxion.stock import Stock
+from stockaxion.logger import logger
 
 
 class StockFilter:
