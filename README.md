@@ -1,4 +1,4 @@
-# stockai
+# stockaxion
 Find opportunity to invest in stocks
 
 ## Get started

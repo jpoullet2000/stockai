@@ -3,9 +3,6 @@ import ast
 from stockai.utils.llm import llm_client
 
 
-VALID_SEARCH_CRITERIA = ["rise_and_fall"]
-
-
 class StockSearch(object):
     """Class to search for stocks ticker symbols based on some search criteria."""
 
@@ -49,6 +46,32 @@ class StockSearch(object):
         return results
 
 
+@StockSearch.register_search_method("cup_and_handle")
+def _search_for_cup_and_handle(
+    self,
+) -> List[str]:
+    """Search for stocks that have a cup and handle pattern.
+    This call the LLM Grok model to get the stocks that match the search criteria.
+
+    Returns:
+        List[str]: A list of stock ticker symbols that match the search criteria.
+    """
+    prompt = (
+        "Find stocks that have a cup and handle pattern. "
+        "For each stock, provide the ticker symbol "
+        "such that the response should for instance be ['AAPL', 'GOOGL', 'AMZN'], no extra text. "
+        "If you can provide 10 stocks, that would be great."
+    )
+    completion = llm_client.chat.completions.create(
+        model="grok-beta",
+        messages=[
+            {"role": "system", "content": "You are an expert in stock markets."},
+            {"role": "user", "content": prompt},
+        ],
+    )
+    return ast.literal_eval(completion.choices[0].message.content)
+
+
 @StockSearch.register_search_method("rise_and_fall")
 def _search_for_rise_and_fall(
     rise: int = 100,
@@ -86,3 +109,8 @@ def _search_for_rise_and_fall(
         ],
     )
     return ast.literal_eval(completion.choices[0].message.content)
+
+
+VALID_SEARCH_CRITERIA = (
+    StockSearch._search_methods
+)  # ["rise_and_fall", "cup_and_handle"]

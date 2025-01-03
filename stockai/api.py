@@ -17,7 +17,7 @@ class Investor:
         self.patterns = patterns or get_all_pattern_functions()
         self.extra_params = extra_params
 
-    def run(self):
+    def run(self, use_filters: bool = True):
         """First get stocks from the stock search, then filter the stocks
         based on the given patterns and finally generate a report."""
         if not self.stocks:
@@ -25,13 +25,20 @@ class Investor:
             search_criteria = self.extra_params.get("search_criteria")
             self.stocks = StockSearch().search(search_criteria)
             logger.info(f"Found {len(self.stocks)} stocks: {self.stocks}")
-        logger.info(f"Filtering stocks based on patterns: {self.patterns}")
-        filtered_stocks = StockFilter(
-            stocks=self.stocks, patterns=self.patterns, extra_params=self.extra_params
-        ).filter()
-        logger.info(
-            f"Found {len(filtered_stocks)} stocks after filtering: {filtered_stocks}"
-        )
+
+        if not use_filters:
+            logger.info("Skipping filters")
+            filtered_stocks = self.stocks
+        else:
+            logger.info(f"Filtering stocks based on patterns: {self.patterns}")
+            filtered_stocks = StockFilter(
+                stocks=self.stocks,
+                patterns=self.patterns,
+                extra_params=self.extra_params,
+            ).filter()
+            logger.info(
+                f"Found {len(filtered_stocks)} stocks after filtering: {filtered_stocks}"
+            )
         if not filtered_stocks:
             logger.info("No stocks found")
             return

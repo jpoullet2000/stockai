@@ -5,8 +5,11 @@ from fpdf import FPDF
 import markdown2
 import tempfile
 from tempfile import TemporaryDirectory
+from stockai.utils.generic import get_date
 
 TEMP_DIR = TemporaryDirectory()
+DEFAULT_INTERVAL = "1wk"
+DEFAULT_PERIOD = "5y"
 
 
 class PDF(FPDF):
@@ -31,7 +34,7 @@ class Report:
     def __init__(
         self,
         stocks: List[str] | List[Stock],
-        output_file: str = "report.pdf",
+        output_file: str = f"{get_date()}-report.pdf",
         extra_params: dict = {},
     ):
         if isinstance(stocks[0], str):
@@ -43,14 +46,14 @@ class Report:
 
     def _update_stocks(self):
         for stock in self.stocks:
-            stock.interval = self.extra_params.get("interval", "1d")
-            stock.period = self.extra_params.get("period", "1y")
+            stock.interval = self.extra_params.get("interval", DEFAULT_INTERVAL)
+            stock.period = self.extra_params.get("period", DEFAULT_PERIOD)
 
     def _display_plots(self):
         for stock in self.stocks:
             stock.fetch_data(
-                period=self.extra_params.get("period", "1y"),
-                interval=self.extra_params.get("interval", "1d"),
+                period=self.extra_params.get("period", DEFAULT_PERIOD),
+                interval=self.extra_params.get("interval", DEFAULT_INTERVAL),
             )
             stock.plot_close_price()
 
@@ -109,8 +112,28 @@ class Report:
                 reason_to_buy_text = self._html_to_text(reason_to_buy_html)
                 content = f"Reason to buy {stock.ticker_symbol}:\n{reason_to_buy_text}"
                 pdf.add_chapter(stock.ticker_symbol, content)
+                pdf.cell(
+                    200,
+                    10,
+                    "Stock Prices (close)".encode("latin-1", "replace").decode(
+                        "latin-1"
+                    ),
+                    ln=True,
+                )
                 pdf.image(close_price_plot_path, x=10, w=190)
+                pdf.cell(
+                    200,
+                    10,
+                    "RSI".encode("latin-1", "replace").decode("latin-1"),
+                    ln=True,
+                )
                 pdf.image(rsi_plot_path, x=10, w=190)
+                pdf.cell(
+                    200,
+                    10,
+                    "Volume".encode("latin-1", "replace").decode("latin-1"),
+                    ln=True,
+                )
                 pdf.image(volume_plot_path, x=10, w=190)
                 # pdf.image(plot_path, x=10, w=190)
 
