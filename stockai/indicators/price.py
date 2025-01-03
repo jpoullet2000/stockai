@@ -1,20 +1,15 @@
-def check_rise_then_fall(df):
-    """
-    Check if the stock price has risen a lot then falls 50-75% of the rise.
-    
-    Args:
-        df (pd.DataFrame): The stock data as a pandas DataFrame.
-       
-    """
-    # Calculate the percentage change in the stock price
-    df["price_change"] = df["Close"].pct_change() * 100
-    
-    # Check if the stock price has risen a lot then falls 50-75% of the rise
-    if df["price_change"].max() > 10 and df["price_change"].min() < -50:
-        return True
-    else:
-        return False
-    
+def calculate_rsi(data, window=14):
+    delta = data["Close"].diff()
+    gain = (delta.where(delta > 0, 0)).fillna(0)
+    loss = (-delta.where(delta < 0, 0)).fillna(0)
+
+    avg_gain = gain.rolling(window=window, min_periods=1).mean()
+    avg_loss = loss.rolling(window=window, min_periods=1).mean()
+
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+
 
 def estimate_rise(df):
     """This function estimates the highest rise
@@ -34,4 +29,3 @@ def estimate_rise(df):
     highest_rise = df["price_change"].max()
 
     return highest_rise
-

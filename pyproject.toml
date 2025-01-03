@@ -10,7 +10,15 @@ python = "^3.11"
 openai = "^1.57.4"
 python-dotenv = "^1.0.1"
 yfinance = "^0.2.50"
+matplotlib = "^3.10.0"
+markdown2 = "^2.5.2"
+fpdf2 = "^2.8.2"
+beautifulsoup4 = "^4.12.3"
+fpdf = "^1.7.2"
 
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8.4"
 
 [build-system]
 requires = ["poetry-core"]
