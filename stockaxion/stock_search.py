@@ -1,6 +1,6 @@
 from typing import List, Dict, Callable
 import ast
-from stockai.utils.llm import llm_client
+from stockaxion.utils.llm import llm_client
 
 
 class StockSearch(object):

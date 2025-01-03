@@ -1,7 +1,7 @@
 import os
 import yfinance as yf
 from matplotlib import pyplot as plt
-from stockai.indicators.price import calculate_rsi
+from stockaxion.indicators.price import calculate_rsi
 
 
 def is_ticker_valid(ticker: str) -> str:

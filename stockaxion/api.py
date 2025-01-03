@@ -1,9 +1,9 @@
 from typing import List
-from stockai.stock_search import StockSearch
-from stockai.stock_filter import StockFilter
-from stockai.reporting import Report
-from stockai.indicators.pattern import get_all_pattern_functions
-from stockai.logger import logger
+from stockaxion.stock_search import StockSearch
+from stockaxion.stock_filter import StockFilter
+from stockaxion.reporting import Report
+from stockaxion.indicators.pattern import get_all_pattern_functions
+from stockaxion.logger import logger
 
 
 class Investor:
