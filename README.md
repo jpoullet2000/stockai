@@ -19,7 +19,7 @@ investor.run()
 
 If you want to specify a search criterion, say you're looking for a cup and handle pattern, 
 
-```
+```python
 investor = Investor(extra_params={"search_criteria": ["cup_and_handle"]})
 investor.run(use_filters=False)
 ```
@@ -27,7 +27,7 @@ The `use_filters=False` option means that no filter will be applied to the resul
 
 You can also specify the stocks you want to analyze with the `stocks` argument.  
 
-```
+```python
 investor = Investor(
     stocks=['TSLA', 'RIVN', 'PLTR', 'ROKU'],
     patterns=["check_rise_then_fall"],
