@@ -11,3 +11,9 @@ llm_client = OpenAI(
     base_url="https://api.x.ai/v1",
 )
 
+
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# llm_client = OpenAI(
+#     api_key=OPENAI_API_KEY,
+#     # base_url="https://api.openai.com/v1",
+# )

@@ -1,5 +1,6 @@
 from typing import List, Dict, Callable
 import ast
+import os
 from stockaxion.utils.llm import llm_client
 
 
@@ -63,7 +64,8 @@ def _search_for_cup_and_handle(
         "If you can provide 10 stocks, that would be great."
     )
     completion = llm_client.chat.completions.create(
-        model="grok-beta",
+        # model="grok-beta",
+        model=os.getenv("LLM_MODEL"),
         messages=[
             {"role": "system", "content": "You are an expert in stock markets."},
             {"role": "user", "content": prompt},
@@ -102,7 +104,8 @@ def _search_for_rise_and_fall(
         "If you can provide 10 stocks, that would be great."
     )
     completion = llm_client.chat.completions.create(
-        model="grok-beta",
+        # model="grok-beta",
+        model=os.getenv("LLM_MODEL"),
         messages=[
             {"role": "system", "content": "You are an expert in stock markets."},
             {"role": "user", "content": prompt},

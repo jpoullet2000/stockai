@@ -1,3 +1,4 @@
+import os
 from typing import List
 from stockaxion.stock import Stock
 from stockaxion.utils.llm import llm_client
@@ -61,7 +62,8 @@ class Report:
         """Get the reason to buy the stock."""
         prompt = f"Find the reasons to buy {stock.ticker_symbol}."
         completion = llm_client.chat.completions.create(
-            model="grok-beta",
+            # model="grok-beta",
+            model=os.getenv("LLM_MODEL"),
             messages=[
                 {
                     "role": "system",
