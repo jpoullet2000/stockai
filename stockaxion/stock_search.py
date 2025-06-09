@@ -9,6 +9,12 @@ class StockSearch(object):
 
     _search_methods: Dict[str, Callable] = {}
 
+    # Class-level blacklist for permanently excluded tickers
+    _blacklisted_tickers: List[str] = [
+        # Add tickers you want to permanently exclude
+        # Example: "PENN", "SPCE", "GME", "AMC"
+    ]
+
     @classmethod
     def register_search_method(cls, name: str):
         def decorator(func: Callable):
@@ -17,16 +23,53 @@ class StockSearch(object):
 
         return decorator
 
+    @classmethod
+    def add_to_blacklist(cls, tickers: List[str]):
+        """Add tickers to the permanent blacklist.
+
+        Args:
+            tickers (List[str]): List of ticker symbols to blacklist.
+        """
+        cls._blacklisted_tickers.extend([ticker.upper() for ticker in tickers])
+        # Remove duplicates
+        cls._blacklisted_tickers = list(set(cls._blacklisted_tickers))
+
+    @classmethod
+    def remove_from_blacklist(cls, tickers: List[str]):
+        """Remove tickers from the permanent blacklist.
+
+        Args:
+            tickers (List[str]): List of ticker symbols to remove from blacklist.
+        """
+        remove_upper = [ticker.upper() for ticker in tickers]
+        cls._blacklisted_tickers = [
+            ticker
+            for ticker in cls._blacklisted_tickers
+            if ticker.upper() not in remove_upper
+        ]
+
+    @classmethod
+    def get_blacklist(cls) -> List[str]:
+        """Get the current blacklist.
+
+        Returns:
+            List[str]: Current blacklisted tickers.
+        """
+        return cls._blacklisted_tickers.copy()
+
     def __init__(self):
         pass
 
     def search(
-        self, search_criteria: List[str] | None = ["rise_and_fall"]
+        self,
+        search_criteria: List[str] | None = ["rise_and_fall"],
+        exclude_tickers: List[str] | None = None,
     ) -> List[str]:
         """Search for stocks based on the given search criteria.
 
         Args:
             search_criteria (str): The search criteria to use.
+            exclude_tickers (List[str], optional): List of ticker symbols to exclude from results.
 
         Returns:
             List[str]: A list of stock ticker symbols that match the search criteria.
@@ -41,18 +84,37 @@ class StockSearch(object):
                 )
 
         results = []
-        for criterion in search_criteria:
-            results.extend(self._search_methods[criterion](self))
 
-        return results
+        # Combine exclusion lists (blacklist + temporary exclusions)
+        all_exclusions = self._blacklisted_tickers.copy()
+        if exclude_tickers:
+            all_exclusions.extend(exclude_tickers)
+
+        for criterion in search_criteria:
+            results.extend(self._search_methods[criterion](self, all_exclusions))
+
+        # Remove duplicates and filter out any remaining excluded tickers (as backup)
+        unique_results = list(set(results))
+
+        if all_exclusions:
+            # Convert to uppercase for case-insensitive comparison
+            exclude_upper = [ticker.upper() for ticker in all_exclusions]
+            unique_results = [
+                ticker
+                for ticker in unique_results
+                if ticker.upper() not in exclude_upper
+            ]
+
+        return unique_results
 
 
 @StockSearch.register_search_method("cup_and_handle")
-def _search_for_cup_and_handle(
-    self,
-) -> List[str]:
+def _search_for_cup_and_handle(self, exclude_tickers: List[str] = None) -> List[str]:
     """Search for stocks that have a cup and handle pattern.
     This call the LLM Grok model to get the stocks that match the search criteria.
+
+    Args:
+        exclude_tickers (List[str], optional): List of ticker symbols to exclude from results.
 
     Returns:
         List[str]: A list of stock ticker symbols that match the search criteria.
@@ -63,6 +125,12 @@ def _search_for_cup_and_handle(
         "such that the response should for instance be ['AAPL', 'GOOGL', 'AMZN'], no extra text. "
         "If you can provide 10 stocks, that would be great."
     )
+
+    # Add exclusion instruction to prompt if there are tickers to exclude
+    if exclude_tickers:
+        exclude_str = ", ".join(exclude_tickers)
+        prompt += f"\n\nIMPORTANT: Do NOT include any of these tickers in your response: {exclude_str}"
+
     completion = llm_client.chat.completions.create(
         # model="grok-beta",
         model=os.getenv("LLM_MODEL"),
@@ -76,21 +144,15 @@ def _search_for_cup_and_handle(
 
 @StockSearch.register_search_method("rise_and_fall")
 def _search_for_rise_and_fall(
-    rise: int = 100,
-    fall: int = 50,
-    months=4,
-    # self, rise: int = 100, fall: int = 50, months=4
+    self, exclude_tickers: List[str] = None, rise: int = 100, fall: int = 50, months=4
 ) -> List[str]:
     """Search for stocks that have risen a lot then fallen 50-75% of the rise.
     This call the LLM Grok model to get the stocks that match the search criteria.
 
-
     Args:
+        exclude_tickers (List[str], optional): List of ticker symbols to exclude from results.
         rise (int): The percentage rise in the stock price.
-        fall (int): Thesearch_methods = {
-        "rise_and_fall": self._search_for_rise_and_fall,
-        # Add other criteria and corresponding methods here
-    } percentage fall in the stock price.
+        fall (int): The percentage fall in the stock price.
         months (int): The number of months in which the fall should occur.
 
     Returns:
@@ -103,6 +165,12 @@ def _search_for_rise_and_fall(
         "such that the response should for instance be ['AAPL', 'GOOGL', 'AMZN'], no extra text. "
         "If you can provide 10 stocks, that would be great."
     )
+
+    # Add exclusion instruction to prompt if there are tickers to exclude
+    if exclude_tickers:
+        exclude_str = ", ".join(exclude_tickers)
+        prompt += f"\n\nIMPORTANT: Do NOT include any of these tickers in your response: {exclude_str}"
+
     completion = llm_client.chat.completions.create(
         # model="grok-beta",
         model=os.getenv("LLM_MODEL"),
