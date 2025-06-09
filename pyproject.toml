@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "stockai"
+name = "stockaxion"
 version = "0.1.0"
 description = ""
 authors = ["Jean-Baptiste Poullet <jeanbaptistepoullet@gmail.com>"]
@@ -9,12 +9,15 @@ readme = "README.md"
 python = "^3.11"
 openai = "^1.57.4"
 python-dotenv = "^1.0.1"
-yfinance = "^0.2.50"
+yfinance = "^0.2.62"
+curl-cffi = "^0.11.3"
+requests = "^2.32.0"
 matplotlib = "^3.10.0"
 markdown2 = "^2.5.2"
 fpdf2 = "^2.8.2"
 beautifulsoup4 = "^4.12.3"
-fpdf = "^1.7.2"
+pandas = "^2.2.0"
+numpy = "^1.26.0"
 
 
 [tool.poetry.group.dev.dependencies]
