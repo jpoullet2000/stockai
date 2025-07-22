@@ -91,19 +91,25 @@ class StockSearch(object):
             all_exclusions.extend(exclude_tickers)
 
         for criterion in search_criteria:
-            results.extend(self._search_methods[criterion](self, all_exclusions))
+            results.extend(
+                self._search_methods[criterion](self, exclude_tickers=all_exclusions)
+            )
 
         # Remove duplicates and filter out any remaining excluded tickers (as backup)
         unique_results = list(set(results))
+        print(f"DEBUG: Before exclusion filtering: {unique_results}")
+        print(f"DEBUG: All exclusions: {all_exclusions}")
 
         if all_exclusions:
             # Convert to uppercase for case-insensitive comparison
             exclude_upper = [ticker.upper() for ticker in all_exclusions]
-            unique_results = [
+            filtered_results = [
                 ticker
                 for ticker in unique_results
                 if ticker.upper() not in exclude_upper
             ]
+            print(f"DEBUG: After exclusion filtering: {filtered_results}")
+            return filtered_results
 
         return unique_results
 
@@ -139,7 +145,8 @@ def _search_for_cup_and_handle(self, exclude_tickers: List[str] = None) -> List[
             {"role": "user", "content": prompt},
         ],
     )
-    return ast.literal_eval(completion.choices[0].message.content)
+    result = ast.literal_eval(completion.choices[0].message.content)
+    return result
 
 
 @StockSearch.register_search_method("rise_and_fall")

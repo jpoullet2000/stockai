@@ -23,7 +23,10 @@ class Investor:
         if not self.stocks:
             logger.info("No stocks provided. Searching for stocks...")
             search_criteria = self.extra_params.get("search_criteria")
-            self.stocks = StockSearch().search(search_criteria)
+            exclude_tickers = self.extra_params.get("exclude_tickers")
+            self.stocks = StockSearch().search(
+                search_criteria, exclude_tickers=exclude_tickers
+            )
             logger.info(f"Found {len(self.stocks)} stocks: {self.stocks}")
 
         if not use_filters:
